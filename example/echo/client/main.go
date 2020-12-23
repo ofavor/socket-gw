@@ -18,6 +18,13 @@ func main() {
 	if err := client.Connect(); err != nil {
 		log.Fatal("Connect error:", err)
 	}
+	if err := client.Send(transport.NewPacket(transport.PacketTypeAuth, []byte("abcd"))); err != nil {
+		log.Fatal("Auth error:", err)
+	}
+	log.Info("Waiting for auth ACK ...")
+	if _, err := client.Recv(); err != nil {
+		log.Fatal(err)
+	}
 
 	go func() {
 		for {

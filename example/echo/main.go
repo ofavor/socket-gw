@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,6 +16,14 @@ import (
 
 type myHandler struct {
 	session.BaseHandler
+}
+
+func (h *myHandler) OnSessionAuth(s *session.Session, p *transport.Packet) error {
+	token := string(p.Body)
+	if token == "abcd" {
+		return nil
+	}
+	return errors.New("Token invalid")
 }
 
 func (h *myHandler) OnSessionReceived(s *session.Session, p *transport.Packet) error {
@@ -32,6 +41,7 @@ func main() {
 	gw := gw.NewGateway(
 		gw.LogLevel("debug"),
 		gw.Address(":9999"),
+		gw.SessionAuth(true),
 		gw.SessionHandler(container),
 	)
 	go func() {
