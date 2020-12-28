@@ -57,6 +57,7 @@ type Session struct {
 	recvCh chan *transport.Packet
 	stopCh chan interface{}
 	status Status
+	meta   map[string]string
 }
 
 // NewSession create new session
@@ -71,6 +72,7 @@ func NewSession(conn transport.Conn, t transport.Transport, handler Handler, aut
 		recvCh:    make(chan *transport.Packet, RecvBufferSize),
 		stopCh:    make(chan interface{}),
 		status:    StatusInitial,
+		meta:      make(map[string]string),
 	}
 }
 
@@ -108,6 +110,11 @@ func (s *Session) auth() error {
 	case <-time.After(5 * time.Second):
 		return ErrSessionAuthTimeout
 	}
+}
+
+// Meta get session meta
+func (s *Session) Meta() map[string]string {
+	return s.meta
 }
 
 // Run start session
