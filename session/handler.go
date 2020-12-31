@@ -49,6 +49,17 @@ func (h *BaseHandler) GetSession(id string) (*Session, error) {
 	return s, nil
 }
 
+// GetAllSessions get all sessions
+func (h *BaseHandler) GetAllSessions() ([]*Session, error) {
+	h.RLock()
+	defer h.Unlock()
+	ret := make([]*Session, len(h.sessions))
+	for _, s := range h.sessions {
+		ret = append(ret, s)
+	}
+	return ret, nil
+}
+
 // GetTotalSessions get total session count
 func (h *BaseHandler) GetTotalSessions() int {
 	h.RLock()
