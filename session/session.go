@@ -163,8 +163,8 @@ LOOP:
 			}
 			switch p.Type {
 			case transport.PacketTypePing:
-				p = transport.NewPacket(transport.PacketTypePong, nil)
-				s.transport.Write(s.conn, p)
+				pp := transport.NewPacket(transport.PacketTypePong, nil)
+				s.transport.Write(s.conn, pp)
 			default:
 				log.Errorf("Session %s got packet with invalid type:%d", s.id, p.Type)
 			}

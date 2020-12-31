@@ -25,11 +25,14 @@ func (t *defaultTransport) Read(conn Conn) (*Packet, error) {
 	if _, err := io.ReadFull(conn, body); err != nil {
 		return nil, err
 	}
-	return &Packet{
+
+	p := &Packet{
 		Length: l,
 		Type:   ty,
 		Body:   body,
-	}, nil
+	}
+	log.Debug("Transport read packet:", p)
+	return p, nil
 }
 
 func (t *defaultTransport) Write(conn Conn, p *Packet) error {
