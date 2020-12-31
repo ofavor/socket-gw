@@ -22,9 +22,11 @@ func main() {
 		log.Fatal("Auth error:", err)
 	}
 	log.Info("Waiting for auth ACK ...")
-	if _, err := client.Recv(); err != nil {
+	ack, err := client.Recv()
+	if err != nil {
 		log.Fatal(err)
 	}
+	log.Info("ACK:", ack)
 
 	go func() {
 		for {

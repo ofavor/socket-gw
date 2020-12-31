@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,11 +37,15 @@ func (h *myHandler) OnSessionReceived(s *session.Session, p *transport.Packet) e
 }
 
 func main() {
+	go func() {
+		http.ListenAndServe("0.0.0.0:9990", nil)
+	}()
+
 	container := &myHandler{
 		BaseHandler: session.NewBaseHandler(),
 	}
 	gw := gw.NewGateway(
-		gw.LogLevel("debug"),
+		// gw.LogLevel("debug"),
 		gw.Address(":9999"),
 		gw.SessionAuth(true),
 		gw.SessionHandler(container),
