@@ -104,10 +104,12 @@ func (s *Session) auth() error {
 			ch <- nil
 		}
 	}()
+	timeout := time.NewTimer(5 * time.Second)
+	defer timeout.Stop()
 	select {
 	case err := <-ch:
 		return err
-	case <-time.After(5 * time.Second):
+	case <-timeout.C:
 		return ErrSessionAuthTimeout
 	}
 }
