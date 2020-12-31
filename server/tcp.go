@@ -2,13 +2,17 @@ package server
 
 import (
 	"net"
+	"sync"
 
 	"github.com/ofavor/socket-gw/internal/log"
 	"github.com/ofavor/socket-gw/session"
 )
 
 type tcpServer struct {
-	opts Options
+	opts     Options
+	listener net.Listener
+	stopCh   chan interface{}
+	wg       sync.WaitGroup
 }
 
 func (s *tcpServer) Init(o Option) {
@@ -24,11 +28,19 @@ func (s *tcpServer) Run() error {
 	if err != nil {
 		return err
 	}
+	s.listener = l
 	log.Info("Server is listened on:", s.opts.Addr)
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
 		for {
-			conn, err := l.Accept()
+			conn, err := s.listener.Accept()
 			if err != nil {
+				select {
+				case <-s.stopCh: // server stopped
+					return
+				default:
+				}
 				log.Error("Accept connection error:", err)
 				continue
 			}
@@ -41,6 +53,9 @@ func (s *tcpServer) Run() error {
 }
 
 func (s *tcpServer) Stop() error {
+	close(s.stopCh) // close the stop channel
+	s.listener.Close()
+	s.wg.Wait()
 	return nil
 }
 
@@ -50,6 +65,7 @@ func newTCPServer(opts ...Option) Server {
 		o(&options)
 	}
 	return &tcpServer{
-		opts: options,
+		opts:   options,
+		stopCh: make(chan interface{}),
 	}
 }

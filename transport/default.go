@@ -7,25 +7,9 @@ import (
 	"github.com/ofavor/socket-gw/internal/log"
 )
 
+// default transport implementation.
+
 type defaultTransport struct {
-}
-
-type packet struct {
-	length int
-	typ    PacketType
-	body   []byte
-}
-
-func (p *packet) Length() int {
-	return p.length
-}
-
-func (p *packet) Type() PacketType {
-	return p.typ
-}
-
-func (p *packet) Body() []byte {
-	return p.body
 }
 
 func (t *defaultTransport) Read(conn Conn) (*Packet, error) {
